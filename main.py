@@ -8,7 +8,7 @@ ____________________________________________________
 """
 
 #создаем поле
-def create_pole(s):
+def create_pole(s: int):
     # Создаем начальное поле
     matrix = [[chr(96 + j) if i == 0 else (str(i) if j == 0 else "_") for j in range(s + 1)] for i in range(s + 1)]
     matrix[0][0] = ""
@@ -17,7 +17,7 @@ def create_pole(s):
     return matrix, free_turns
 
 #формируем список из возможных диаганалей, строк, столбцов, для дальнейшей проверки окончания игры
-def make_items_for_check(pole):
+def make_items_for_check(pole: list):
     column = diagm = diagr = ""
     diags_main = []  # основная диаганаль
     diags_reverse = [] # побочная диаганаль
@@ -44,7 +44,7 @@ def make_items_for_check(pole):
 
 
 # Отображение игрового поля
-def show_game(pole):
+def show_game(pole: list):
     print()
     for raw in pole:
         raw = list(map(lambda x: x.ljust(2), raw))
@@ -52,7 +52,7 @@ def show_game(pole):
 
 
 # Ход комьютера
-def ii_turn(pole, free_turns, ii_item, d):
+def ii_turn(pole: list, free_turns: set, ii_item: str, d: dict):
     turn = free_turns.pop()
     if turn.startswith("10"):
         x = 10
@@ -68,7 +68,7 @@ def ii_turn(pole, free_turns, ii_item, d):
 
 
 # Ход игрока
-def player_turn(pole, pl_item):
+def player_turn(pole: list, pl_item: str):
     # словарь для преобразования введеного игроком хода в индексы игрового поля
     d_columns = {chr(96 + i): i for i in range(1, len(pole))}
     d = d_columns.copy()
@@ -105,7 +105,7 @@ def player_turn(pole, pl_item):
 
 
 # Проверка результата игры
-def check_game(pole, turns, pl_item, ii_item):
+def check_game(pole: list, turns: set, pl_item: str, ii_item: str):
     flag_end = False
     grats = "\nПоздравляем, Вы победили!!!\n"
     shame = "\nВы проиграли :(\n"
@@ -133,7 +133,7 @@ def check_game(pole, turns, pl_item, ii_item):
     return flag_end
 
 
-def game(size, pl_item):
+def game(size: int, pl_item: str):
     pole, free_turns = set(), []
     ii_item = ""
     d = {}
