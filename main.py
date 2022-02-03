@@ -7,8 +7,11 @@ ____________________________________________________
 с помощью модуль test.py можно произвести тестирование, полностью рандомной генерации поля
 """
 
-#создаем поле
-def create_pole(s: int):
+# создаем поле
+from typing import Tuple
+
+
+def create_pole(s: int) -> Tuple[list, set]:
     # Создаем начальное поле
     matrix = [[chr(96 + j) if i == 0 else (str(i) if j == 0 else "_") for j in range(s + 1)] for i in range(s + 1)]
     matrix[0][0] = ""
@@ -16,11 +19,12 @@ def create_pole(s: int):
     free_turns = set(i + j for i in map(str, range(1, s + 1)) for j in map(str, range(1, s + 1)))
     return matrix, free_turns
 
-#формируем список из возможных диаганалей, строк, столбцов, для дальнейшей проверки окончания игры
-def make_items_for_check(pole: list):
+
+# формируем список из возможных диаганалей, строк, столбцов, для дальнейшей проверки окончания игры
+def make_items_for_check(pole: list) -> Tuple[list, list, list, list]:
     column = diagm = diagr = ""
     diags_main = []  # основная диаганаль
-    diags_reverse = [] # побочная диаганаль
+    diags_reverse = []  # побочная диаганаль
     raws = []
     columns = []
     # формируем списки строк, столбцов
@@ -32,9 +36,9 @@ def make_items_for_check(pole: list):
         raws.append(raw)
         column = ""
     # формируем списки основных и побочных диаганалей
-    for step in range(len(pole) - 5): #игнорируем диаганали размером меньше 5
+    for step in range(len(pole) - 5):  # игнорируем диаганали размером меньше 5
         for i in range(len(pole) - 5):
-            for j in range(1, 6): #формируем диаганаль длиной 5
+            for j in range(1, 6):  # формируем диаганаль длиной 5
                 diagr += pole[len(pole) - j - i][j + step]
                 diagm += pole[j + i][j + step]
             diags_main.append(diagm)
@@ -44,7 +48,7 @@ def make_items_for_check(pole: list):
 
 
 # Отображение игрового поля
-def show_game(pole: list):
+def show_game(pole: list) -> None:
     print()
     for raw in pole:
         raw = list(map(lambda x: x.ljust(2), raw))
@@ -52,7 +56,7 @@ def show_game(pole: list):
 
 
 # Ход комьютера
-def ii_turn(pole: list, free_turns: set, ii_item: str, d: dict):
+def ii_turn(pole: list, free_turns: set, ii_item: str, d: dict) -> str:
     turn = free_turns.pop()
     if turn.startswith("10"):
         x = 10
@@ -64,11 +68,11 @@ def ii_turn(pole: list, free_turns: set, ii_item: str, d: dict):
         print(f"\nход противника: {d[turn[1:]]}{turn[0]}")
     pole[x][y] = ii_item
     show_game(pole)
-    return turn, pole
+    return turn
 
 
 # Ход игрока
-def player_turn(pole: list, pl_item: str):
+def player_turn(pole: list, pl_item: str) -> str:
     # словарь для преобразования введеного игроком хода в индексы игрового поля
     d_columns = {chr(96 + i): i for i in range(1, len(pole))}
     d = d_columns.copy()
@@ -101,11 +105,11 @@ def player_turn(pole: list, pl_item: str):
         else:
             print("\nход введен не корректно. Формат вводимых данных: 'A1'")
         show_game(pole)
-    return turn, pole
+    return turn
 
 
 # Проверка результата игры
-def check_game(pole: list, turns: set, pl_item: str, ii_item: str):
+def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
     flag_end = False
     grats = "\nПоздравляем, Вы победили!!!\n"
     shame = "\nВы проиграли :(\n"
@@ -133,7 +137,7 @@ def check_game(pole: list, turns: set, pl_item: str, ii_item: str):
     return flag_end
 
 
-def game(size: int, pl_item: str):
+def game(size: int, pl_item: str) -> None:
     pole, free_turns = set(), []
     ii_item = ""
     d = {}
@@ -152,12 +156,12 @@ def game(size: int, pl_item: str):
 
     while not flag_end:
         # ход пользователя
-        turn, pole = player_turn(pole, pl_item)
+        turn = player_turn(pole, pl_item)
         free_turns.remove(turn)
         flag_end = check_game(pole, free_turns, pl_item, ii_item)
         # ход противника
         if not flag_end:
-            turn, pole = ii_turn(pole, free_turns, ii_item, d)
+            ii_turn(pole, free_turns, ii_item, d)
             flag_end = check_game(pole, free_turns, pl_item, ii_item)
 
 

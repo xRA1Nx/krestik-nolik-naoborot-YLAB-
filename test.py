@@ -1,17 +1,30 @@
-def create_pole(s):
+"""
+Противник ходит по принципу рандома из множествасвободных ходов
+Это реализовано через tuple - free_turns, с помощью pop()
+сокращаем рандомно множество и имеем скорость О(1)
+____________________________________________________
+
+с помощью модуль test.py можно произвести тестирование, полностью рандомной генерации поля
+"""
+
+# создаем поле
+from typing import Tuple
+
+
+def create_pole(s: int) -> Tuple[list, set]:
     # Создаем начальное поле
     matrix = [[chr(96 + j) if i == 0 else (str(i) if j == 0 else "_") for j in range(s + 1)] for i in range(s + 1)]
     matrix[0][0] = ""
-
     # создаем начальный список свободных ходов
     free_turns = set(i + j for i in map(str, range(1, s + 1)) for j in map(str, range(1, s + 1)))
     return matrix, free_turns
 
 
-def make_items_for_check(pole):
+# формируем список из возможных диаганалей, строк, столбцов, для дальнейшей проверки окончания игры
+def make_items_for_check(pole: list) -> Tuple[list, list, list, list]:
     column = diagm = diagr = ""
-    diags_main = []
-    diags_reverse = []
+    diags_main = []  # основная диаганаль
+    diags_reverse = []  # побочная диаганаль
     raws = []
     columns = []
     # формируем списки строк, столбцов
@@ -23,9 +36,9 @@ def make_items_for_check(pole):
         raws.append(raw)
         column = ""
     # формируем списки основных и побочных диаганалей
-    for step in range(len(pole) - 5):
+    for step in range(len(pole) - 5):  # игнорируем диаганали размером меньше 5
         for i in range(len(pole) - 5):
-            for j in range(1, 6):
+            for j in range(1, 6):  # формируем диаганаль длиной 5
                 diagr += pole[len(pole) - j - i][j + step]
                 diagm += pole[j + i][j + step]
             diags_main.append(diagm)
@@ -35,7 +48,7 @@ def make_items_for_check(pole):
 
 
 # Отображение игрового поля
-def show_game(pole):
+def show_game(pole: list) -> None:
     print()
     for raw in pole:
         raw = list(map(lambda x: x.ljust(2), raw))
@@ -43,17 +56,19 @@ def show_game(pole):
 
 
 # Ход комьютера
-def ii_turn(pole, free_turns, ii_item):
+def ii_turn(pole: list, free_turns: set, ii_item: str, d: dict) -> str:
     turn = free_turns.pop()
-    print(turn)
     if turn.startswith("10"):
         x = 10
         y = int(turn[2:])
+        print(f"\nход противника: {d['10']}{turn[0]}")
     else:
         x = int(turn[0])
         y = int(turn[1:])
+        print(f"\nход противника: {d[turn[1:]]}{turn[0]}")
     pole[x][y] = ii_item
-    return turn, pole
+    show_game(pole)
+    return turn
 
 
 # Ход игрока
@@ -66,11 +81,10 @@ def player_turn(pole, pl_item, free_turns):
         x = int(turn[0])
         y = int(turn[1:])
     pole[x][y] = pl_item
-    return turn, pole
-
+    return turn
 
 # Проверка результата игры
-def end_game(pole, turns, pl_item, ii_item):
+def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
     flag_end = False
     grats = "\nПоздравляем, Вы победили!!!\n"
     shame = "\nВы проиграли :(\n"
@@ -98,13 +112,13 @@ def end_game(pole, turns, pl_item, ii_item):
     return flag_end
 
 
-def game(size, pl_item):
-    pole, free_turns = [], []
+def game(size: int, pl_item: str) -> None:
+    pole, free_turns = set(), []
     ii_item = ""
     d = {}
     flag_end = False
     items = ["x", "0"]
-    if any([pl_item not in items, size not in range(3, 11)]):
+    if any([pl_item not in items, size not in range(5, 11)]):
         flag_end = True
         print("игра запущена с неверными параметрами")
     else:
@@ -113,30 +127,28 @@ def game(size, pl_item):
         ii_item = "".join(items)
         pole, free_turns = create_pole(size)
         print(f"\nвы играете {pl_item.upper()}")
+    show_game(pole)
 
     while not flag_end:
-        turn, pole = player_turn(pole, pl_item, free_turns)
+        # ход пользователя
+        turn = player_turn(pole, pl_item, free_turns)
         if turn.startswith("10"):
             print(f"\nваш ход: {d['10']}{turn[0]}")
         else:
             print(f"\nваш ход: {d[turn[1:]]}{turn[0]}")
         show_game(pole)
-        flag_end = end_game(pole, free_turns, pl_item, ii_item)
-
+        flag_end = check_game(pole, free_turns, pl_item, ii_item)
         # ход противника
         if not flag_end:
-            turn, pole = ii_turn(pole, free_turns, ii_item)
-            if turn.startswith("10"):
-                print(f"\nход противника: {d['10']}{turn[0]}")
-            else:
-                print(f"\nход противника: {d[turn[1:]]}{turn[0]}")
-            show_game(pole)
-            flag_end = end_game(pole, free_turns, pl_item, ii_item)
+            ii_turn(pole, free_turns, ii_item, d)
+            flag_end = check_game(pole, free_turns, pl_item, ii_item)
 
 
-# опции игры
-# pl_item - выбор чем будет играть игрок ["x" или 0]
-# size - размер поля от 5 до 10
+"""
+опции игры:
+pl_item - выбор чем будет играть игрок ["x" или 0]
+size - размер поля от 5 до 10
+"""
 
 if __name__ == "__main__":
     game(pl_item="x", size=10)
