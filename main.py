@@ -8,7 +8,8 @@ ____________________________________________________
 """
 
 # создаем поле
-from typing import Tuple
+from typing import Tuple, NoReturn
+from time import time
 
 
 def create_pole(s: int) -> Tuple[list, set]:
@@ -46,6 +47,7 @@ def make_items_for_check(pole: list) -> Tuple[set, set, set, set]:
             diagm = diagr = ""
     return raws, columns, diags_main, diags_reverse
 
+
 # Проверка результата игры
 def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
     flag_end = False
@@ -58,12 +60,12 @@ def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
     raws, columns, diags_main, diags_reverse = make_items_for_check(pole)
     all_items = raws | columns | diags_main | diags_reverse
     for target in all_items:
-        # проверка выигрыша
+        # проверка на победу
         if gg in target:
             print(grats)
             flag_end = True
             break
-        # проверка проигрыш
+        # проверка на поражение
         if bg in target:
             print(shame)
             flag_end = True
@@ -76,7 +78,7 @@ def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
 
 
 # Отображение игрового поля
-def show_game(pole: list) -> None:
+def show_game(pole: list) -> NoReturn:
     print()
     for raw in pole:
         raw = list(map(lambda x: x.ljust(2), raw))
@@ -136,6 +138,18 @@ def player_turn(pole: list, pl_item: str) -> str:
     return turn
 
 
+# декоратор определяющий сколько времени длится игра
+def time_decorator(fn):
+    t0 = time()
+    def wrapper(*args, **kwargs):
+        fn(*args, **kwargs)
+        t = time() - t0
+        if t > 1:
+            print(f"игры длились {t // 60:.0f} минут(ы) {t % 60:.0f} секунд(ы)")
+    return wrapper
+
+
+@time_decorator
 def game(size: int, pl_item: str) -> None:
     pole, free_turns = set(), []
     ii_item = ""
