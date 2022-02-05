@@ -4,7 +4,7 @@
 сокращаем рандомно множество и имеем скорость О(1)
 ____________________________________________________
 
-с помощью модуль test.py можно произвести тестирование, полностью рандомной генерации поля
+с помощью модуля test.py можно произвести тестирование, полностью рандомной генерации поля
 """
 
 # создаем поле
@@ -139,18 +139,18 @@ def player_turn(pole: list, pl_item: str) -> str:
 
 
 # декоратор определяющий сколько времени длится игра
-def time_decorator(fn):
+def time_decorator(fn) -> NoReturn:
     t0 = time()
+
     def wrapper(*args, **kwargs):
         fn(*args, **kwargs)
         t = time() - t0
-        if t > 1:
-            print(f"игры длились {t // 60:.0f} минут(ы) {t % 60:.0f} секунд(ы)")
+        print(f"игра длилась {t // 60:.0f} минут(ы) {t % 60:.0f} секунд(ы)")
     return wrapper
 
 
 @time_decorator
-def game(size: int, pl_item: str) -> None:
+def game(size: int, pl_item: str):
     pole, free_turns = set(), []
     ii_item = ""
     d = {}

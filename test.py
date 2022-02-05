@@ -8,7 +8,8 @@ ____________________________________________________
 """
 
 # создаем поле
-from typing import Tuple
+from typing import Tuple, NoReturn
+from time import time
 
 
 def create_pole(s: int) -> Tuple[list, set]:
@@ -76,7 +77,7 @@ def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
 
 
 # Отображение игрового поля
-def show_game(pole: list) -> None:
+def show_game(pole: list) -> NoReturn:
     print()
     for raw in pole:
         raw = list(map(lambda x: x.ljust(2), raw))
@@ -111,6 +112,19 @@ def player_turn(pole, pl_item, free_turns):
     pole[x][y] = pl_item
     return turn
 
+
+# декоратор определяющий сколько времени длится игра
+def time_decorator(fn):
+    t0 = time()
+    def wrapper(*args, **kwargs):
+        fn(*args, **kwargs)
+        t = time() - t0
+
+        print(f"игра длилась {t % 60:.3f} секунд(ы)")
+    return wrapper
+
+
+@time_decorator
 def game(size: int, pl_item: str) -> None:
     pole, free_turns = set(), []
     ii_item = ""
