@@ -47,6 +47,7 @@ def make_items_for_check(pole: list) -> Tuple[set, set, set, set]:
             diagm = diagr = ""
     return raws, columns, diags_main, diags_reverse
 
+
 # Проверка результата игры
 def check_game(pole: list, turns: set, pl_item: str, ii_item: str) -> bool:
     flag_end = False
@@ -116,6 +117,7 @@ def player_turn(pole, pl_item, free_turns):
 # декоратор определяющий сколько времени длится игра
 def time_decorator(fn):
     t0 = time()
+
     def wrapper(*args, **kwargs):
         fn(*args, **kwargs)
         t = time() - t0
